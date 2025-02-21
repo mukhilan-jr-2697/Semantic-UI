@@ -1,5 +1,5 @@
 /*!
- * # Semantic UI 2.2.4 - Dropdown
+ * # Semantic UI - Dropdown
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -2507,6 +2507,11 @@ $.fn.dropdown = function(parameters) {
               escapedValue = module.escape.value(value),
               $label
             ;
+
+            if(settings.ignoreCase) {
+              escapedValue = escapedValue.toLowerCase();
+            }
+
             $label =  $('<a />')
               .addClass(className.label)
               .attr('data-value', escapedValue)
@@ -2963,6 +2968,11 @@ $.fn.dropdown = function(parameters) {
               escapedValue = module.escape.value(value),
               $labels      = $module.find(selector.label)
             ;
+
+            if(settings.ignoreCase) {
+              escapedValue = escapedValue.toLowerCase();
+            }
+
             return ($labels.filter('[data-value="' + escapedValue +'"]').length > 0);
           },
           maxSelections: function() {
@@ -2981,16 +2991,40 @@ $.fn.dropdown = function(parameters) {
             return (module.get.query() !== '');
           },
           value: function(value) {
+            return (settings.ignoreCase)
+                ? module.has.valueIgnoringCase(value)
+                : module.has.valueMatchingCase(value)
+                ;
+          },
+
+          valueMatchingCase: function(value) {
             var
-              values   = module.get.values(),
-              hasValue = $.isArray(values)
-               ? values && ($.inArray(value, values) !== -1)
-               : (values == value)
+                values   = module.get.values(),
+                hasValue = $.isArray(values)
+                    ? values && ($.inArray(value, values) !== -1)
+                    : (values == value)
             ;
             return (hasValue)
-              ? true
-              : false
+                ? true
+                : false
+                ;
+          },
+
+          valueIgnoringCase: function(value) {
+            var
+                values   = module.get.values(),
+                hasValue = false
             ;
+            if(!$.isArray(values)) {
+              values = [values];
+            }
+            $.each(values, function(index, existingValue) {
+              if(String(value).toLowerCase() == String(existingValue).toLowerCase()) {
+                hasValue = true;
+                return false;
+              }
+            });
+            return hasValue;
           }
         },
 
@@ -3520,6 +3554,7 @@ $.fn.dropdown.settings = {
   forceSelection         : true,       // force a choice on blur with search selection
 
   allowAdditions         : false,      // whether multiple select should allow user added values
+  ignoreCase             : false,      // whether to consider values not matching in case to be the same
   hideAdditions          : true,      // whether or not to hide special message prompting a user they can enter a value
 
   maxSelections          : false,      // When set to a number limits the number of selections to this count
