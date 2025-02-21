@@ -2617,7 +2617,7 @@ $.fn.dropdown = function(parameters) {
             else {
               $addition = module.create.userChoice(value);
               $addition
-                .prependTo($menu)
+                .appendTo($menu)
               ;
               module.verbose('Adding item choice to menu corresponding with user choice addition', $addition);
             }
